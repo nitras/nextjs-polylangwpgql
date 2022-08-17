@@ -6,7 +6,6 @@ import { getApolloClient } from "../../lib/apollo-client";
 
 import styles from "../../styles/Home.module.css";
 
-
 export default function Post({ post, site }) {
   return (
     <div className={styles.container}>
@@ -32,7 +31,7 @@ export default function Post({ post, site }) {
         </div>
 
         <p className={styles.backToHome}>
-        <Link href="/">
+          <Link href="/">
             <a className={styles.back}>&lt; Back To Home</a>
           </Link>
         </p>
@@ -41,45 +40,43 @@ export default function Post({ post, site }) {
   );
 }
 
-export async function getStaticProps({params, locale}) {
-const { postSlug } = params;
-const language = locale.toUpperCase();
-  
-const apolloClient = getApolloClient();
+export async function getStaticProps({ params, locale }) {
+  const { postSlug } = params;
+  const language = locale.toUpperCase();
+
+  const apolloClient = getApolloClient();
 
   const data = await apolloClient.query({
     query: gql`
-    query PostBySlug($slug: String!, $language: LanguageCodeEnum!) {
-      generalSettings {
-        title
-      }
-      postBy(slug: $slug) {
-        id
-        content
-        title
-        slug
-        translation(language: $language) {
+      query PostBySlug($slug: String!, $language: LanguageCodeEnum!) {
+        generalSettings {
+          title
+        }
+        postBy(slug: $slug) {
           id
-          slug
           content
           title
-          language {
-            locale
+          slug
+          translation(language: $language) {
+            id
             slug
+            content
+            title
+            language {
+              locale
+              slug
+            }
           }
         }
       }
-    }
     `,
     variables: {
       slug: params.postSlug,
-      language
-      },
+      language,
+    },
   });
 
   let post = data?.data.postBy;
-
-  
 
   const site = {
     ...data?.data.generalSettings,
@@ -126,15 +123,18 @@ export async function getStaticPaths({ locales }) {
   });
 
   return {
-    paths: [...paths,
+    paths: [
+      ...paths,
       ...paths.flatMap((path) => {
         return locales.map((locale) => {
           return {
             ...path,
             locale,
           };
-        })})
-  ],
-    fallback: false,
+        });
+      }),
+    ],
+    paths: [],
+    fallback: "blocking",
   };
 }

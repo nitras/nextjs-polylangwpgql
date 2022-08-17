@@ -18,6 +18,7 @@ export default function Home({ page, posts }) {
 
       <main className={styles.main}>
         <h1 className={styles.title}>{title}</h1>
+        <h2>Stoked</h2>
 
         <p className={styles.description}>{description}</p>
 
@@ -35,7 +36,8 @@ export default function Home({ page, posts }) {
                           __html: post.title,
                         }}
                       />
-                      <div className={styles.excerpt}
+                      <div
+                        className={styles.excerpt}
                         dangerouslySetInnerHTML={{
                           __html: post.excerpt,
                         }}
@@ -65,26 +67,26 @@ export async function getStaticProps({ locale }) {
 
   const data = await apolloClient.query({
     query: gql`
-    query posts($language: LanguageCodeFilterEnum!)  {
-      posts(where: { language: $language }) {
-        edges {
-          node {
-            id
-            excerpt
-            title
-            slug
-            language {
-              code
-              locale
+      query posts($language: LanguageCodeFilterEnum!) {
+        posts(where: { language: $language }) {
+          edges {
+            node {
+              id
+              excerpt
+              title
+              slug
+              language {
+                code
+                locale
+              }
             }
           }
         }
+        generalSettings {
+          title
+          description
+        }
       }
-      generalSettings {
-        title
-        description
-      }
-    }
     `,
     variables: {
       language,
